@@ -180,7 +180,7 @@ export default function Home() {
             ))
           ) : (
             <Typography variant={"h6"} textAlign={"center"} color={"#7b4b4b"}>
-              No items found
+              {inventory.length > 0 ? "No items found" : "No items in inventory"}
             </Typography>
           )}
         </Stack>
