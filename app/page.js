@@ -8,7 +8,12 @@ import {
   Button,
   Modal,
   TextField,
+  Card,
+  CardContent,
+  IconButton,
+  Chip,
 } from "@mui/material";
+import { AddCircleOutline, RemoveCircleOutline } from "@mui/icons-material";
 import { firestore } from "@/firebase";
 import {
   collection,
@@ -27,7 +32,7 @@ const style = {
   transform: "translate(-50%, -50%)",
   width: 400,
   bgcolor: "white",
-  border: "2px solid #000",
+  borderRadius: "16px",
   boxShadow: 24,
   p: 4,
   display: "flex",
@@ -39,7 +44,7 @@ export default function Home() {
   const [inventory, setInventory] = useState([]);
   const [open, setOpen] = useState(false);
   const [itemName, setItemName] = useState("");
-  const [searchTerm, setSearchTerm] = useState(""); // New state for search term
+  const [searchTerm, setSearchTerm] = useState("");
 
   const addItem = async (item) => {
     const docRef = doc(collection(firestore, "inventory"), item);
@@ -86,7 +91,7 @@ export default function Home() {
 
   const filteredInventory = inventory.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
-  ); // Filter items based on search term
+  );
 
   return (
     <Box
@@ -96,7 +101,9 @@ export default function Home() {
       justifyContent={"center"}
       flexDirection={"column"}
       alignItems={"center"}
-      gap={2}
+      gap={4}
+      bgcolor={"#f7f7f7"}
+      padding={4}
     >
       <Modal
         open={open}
@@ -118,11 +125,15 @@ export default function Home() {
               onChange={(e) => setItemName(e.target.value)}
             />
             <Button
-              variant="outlined"
+              variant="contained"
               onClick={() => {
                 addItem(itemName);
                 setItemName("");
                 handleClose();
+              }}
+              sx={{
+                bgcolor: "#00796b",
+                "&:hover": { bgcolor: "#004d40" },
               }}
             >
               Add
@@ -130,7 +141,16 @@ export default function Home() {
           </Stack>
         </Box>
       </Modal>
-      <Button variant="contained" onClick={handleOpen}>
+      <Button
+        variant="contained"
+        onClick={handleOpen}
+        sx={{
+          bgcolor: "#ffa726",
+          "&:hover": { bgcolor: "#fb8c00" },
+          padding: "10px 20px",
+          fontSize: "16px",
+        }}
+      >
         Add New Item
       </Button>
       <TextField
@@ -138,48 +158,74 @@ export default function Home() {
         variant="outlined"
         fullWidth
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)} // Update search term on change
-        sx={{ width: "800px", marginBottom: 2, backgroundColor: "#f0f0f0" }}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        sx={{
+          width: "800px",
+          marginBottom: 2,
+          backgroundColor: "#fff8e1",
+          borderRadius: "8px",
+        }}
       />
-      <Box border={"1px solid #333"}>
-        <Box
-          width="800px"
-          height="100px"
-          bgcolor={"#ADD8E6"}
-          display={"flex"}
-          justifyContent={"center"}
-          alignItems={"center"}
+      <Box width="800px">
+        <Typography
+          variant={"h4"}
+          color={"#00796b"}
+          textAlign={"center"}
+          gutterBottom
         >
-          <Typography variant={"h2"} color={"#333"} textAlign={"center"}>
-            Inventory Items
-          </Typography>
-        </Box>
-        <Stack width="800px" height="300px" spacing={2} overflow={"auto"}>
+          Pantry Inventory
+        </Typography>
+        <Stack spacing={2} overflow={"auto"}>
           {filteredInventory.length > 0 ? (
             filteredInventory.map(({ name, quantity }) => (
-              <Box
+              <Card
                 key={name}
-                width="100%"
-                minHeight="150px"
-                display={"flex"}
-                justifyContent={"space-between"}
-                alignItems={"center"}
-                bgcolor={"#f0f0f0"}
-                paddingX={5}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "16px",
+                  borderRadius: "16px",
+                  bgcolor: "#ffecb3",
+                }}
               >
-                <Typography variant={"h3"} color={"#c53b3b"} textAlign={"center"}>
-                  {name.charAt(0).toUpperCase() + name.slice(1)}
-                </Typography>
-                <Typography variant={"h3"} color={"#7b4b4b"} textAlign={"center"}>
-                  Quantity: {quantity}
-                </Typography>
-                <Button variant="contained" onClick={() => removeItem(name)}>
-                  Remove
-                </Button>
-              </Box>
+                <CardContent>
+                  <Typography
+                    variant={"h5"}
+                    color={"#ff7043"}
+                    fontWeight={"bold"}
+                  >
+                    {name.charAt(0).toUpperCase() + name.slice(1)}
+                  </Typography>
+                  <Chip
+                    label={`Quantity: ${quantity}`}
+                    color="primary"
+                    sx={{ marginTop: "8px" }}
+                  />
+                </CardContent>
+                <Box>
+                  <IconButton
+                    color="error"
+                    onClick={() => removeItem(name)}
+                    sx={{ marginRight: "8px" }}
+                  >
+                    <RemoveCircleOutline />
+                  </IconButton>
+                  <IconButton
+                    color="success"
+                    onClick={() => addItem(name)}
+                  >
+                    <AddCircleOutline />
+                  </IconButton>
+                </Box>
+              </Card>
             ))
           ) : (
-            <Typography variant={"h6"} textAlign={"center"} color={"#7b4b4b"}>
+            <Typography
+              variant={"h6"}
+              textAlign={"center"}
+              color={"#d32f2f"}
+            >
               {inventory.length > 0 ? "No items found" : "No items in inventory"}
             </Typography>
           )}
